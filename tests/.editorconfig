@@ -1,0 +1,5 @@
+[*.cs]
+# Test names are sentences: underscores keep them readable in the test explorer.
+dotnet_diagnostic.CA1707.severity = none
+# Test types are public for the test runner; they are not part of a library surface.
+dotnet_diagnostic.CA1515.severity = none

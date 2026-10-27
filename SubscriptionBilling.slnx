@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SubscriptionBilling.Api/SubscriptionBilling.Api.csproj" />
+    <Project Path="src/SubscriptionBilling.Application/SubscriptionBilling.Application.csproj" />
+    <Project Path="src/SubscriptionBilling.Domain/SubscriptionBilling.Domain.csproj" />
+    <Project Path="src/SubscriptionBilling.Infrastructure/SubscriptionBilling.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SubscriptionBilling.Api.IntegrationTests/SubscriptionBilling.Api.IntegrationTests.csproj" />
+    <Project Path="tests/SubscriptionBilling.Domain.Tests/SubscriptionBilling.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
