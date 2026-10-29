@@ -25,3 +25,12 @@ jobs:
         run: dotnet build SubscriptionBilling.slnx --no-restore --configuration Release
       - name: Test
         run: dotnet test --solution SubscriptionBilling.slnx --no-build --configuration Release
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image builds
+        run: docker build -t subscription-billing-api .
+      - name: Runs as non-root
+        run: test "$(docker run --rm --entrypoint id subscription-billing-api -u)" != "0"

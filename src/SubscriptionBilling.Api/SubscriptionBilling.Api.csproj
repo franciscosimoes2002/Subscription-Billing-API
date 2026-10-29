@@ -4,6 +4,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <UserSecretsId>eb7f2552-ffad-4a77-a557-70769efd8303</UserSecretsId>
+    <!-- Microsoft.Data.SqlClient does not support invariant globalization on Linux, so the API (unlike the SQLite tests) turns it off. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SubscriptionBilling.Application\SubscriptionBilling.Application.csproj" />

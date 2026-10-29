@@ -368,3 +368,18 @@ public sealed class PasswordHasherTests
         Assert.False(_hasher.Verify(stored, "anything at all, really"));
     }
 }
+
+public sealed class HealthTests(ApiFactory factory) : IClassFixture<ApiFactory>
+{
+    [Theory]
+    [InlineData("/health", "healthy")]
+    [InlineData("/ready", "ready")]
+    public async Task Probes_are_public_and_report_status(string route, string status)
+    {
+        var response = await factory.CreateClient().GetAsync(route, Ct);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>(Ct);
+        Assert.Equal(status, body!["status"]);
+    }
+}

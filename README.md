@@ -4,7 +4,7 @@ A REST API for the backend of a SaaS-style product: accounts, subscription plans
 
 It is a portfolio project written to show how a small backend is structured when it is meant to be operated, not just demonstrated: rules live in the domain, the database enforces the invariants that matter, failures are explicit, and every claim below is covered by a test.
 
-> **Status:** phase 1 of 3 is done (accounts, plans, subscriptions, tests, CI). Invoices (PDF), payment simulation, rate limiting, health endpoints and Docker are **not built yet** and are listed under [Roadmap](#roadmap). Nothing in this README describes a feature that does not exist.
+> **Status:** phase 1 of 3 is done (accounts, plans, subscriptions, tests, CI), plus health endpoints and Docker packaging. Invoices (PDF), payment simulation and rate limiting are **not built yet** and are listed under [Roadmap](#roadmap). Nothing in this README describes a feature that does not exist.
 
 ## What it does
 
@@ -29,6 +29,8 @@ All routes are under `/api/v1`. Anything not marked public needs `Authorization:
 | `POST /subscriptions` | user | Body: `{ "planId": "..." }`. |
 | `GET /subscriptions`, `GET /subscriptions/{id}` | user | Only the caller's own. |
 | `POST /subscriptions/{id}/cancel` | user | |
+
+`GET /health` (liveness) and `GET /ready` (the database answers; `503` otherwise) are public, sit outside `/api/v1` and never say why something is not ready.
 
 The OpenAPI document is served at `/openapi/v1.json` in Development (or when `OpenApi:Enabled=true`).
 
@@ -105,6 +107,18 @@ curl -s -X POST localhost:5236/api/v1/auth/login -H 'Content-Type: application/j
 # then: Authorization: Bearer <accessToken> on POST /api/v1/plans, and so on
 ```
 
+### With Docker
+
+Needs only Docker. The multi-stage image runs as a non-root user and listens on port 8080; Compose adds SQL Server and applies the migrations on start.
+
+```bash
+cp .env.example .env          # then fill in MSSQL_SA_PASSWORD, JWT_SIGNING_KEY and the seed admin
+docker compose up --build
+curl -s localhost:8080/ready  # {"status":"ready"}
+```
+
+Compose refuses to start while `MSSQL_SA_PASSWORD` or `JWT_SIGNING_KEY` is empty, and `.env` is git-ignored.
+
 ### Configuration
 
 | Setting | Required | Purpose |
@@ -131,8 +145,8 @@ CI (`.github/workflows/ci.yml`) checks formatting, builds in Release with warnin
 Not built yet, in this order:
 
 1. Payments and invoices: a simulated payment gateway behind an interface, idempotency keys on state-changing requests, invoice history and PDF invoices.
-2. Operations: rate limiting on login and registration, separate `/health` and `/ready` endpoints.
-3. Packaging: multi-stage Dockerfile (non-root) and a Compose file with SQL Server, plus a CI job that runs the integration suite against SQL Server.
+2. Rate limiting on login and registration.
+3. A CI job that runs the integration suite against SQL Server.
 
 Out of scope on purpose: refresh tokens, email verification, password reset and real payment providers.
 

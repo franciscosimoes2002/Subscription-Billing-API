@@ -13,6 +13,7 @@ using SubscriptionBilling.Application;
 using SubscriptionBilling.Application.Abstractions;
 using SubscriptionBilling.Domain.Users;
 using SubscriptionBilling.Infrastructure;
+using SubscriptionBilling.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -129,6 +130,13 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("OpenApi
 }
 
 app.MapControllers();
+
+// Liveness: the process answers. Readiness: the database is reachable. Neither says why it is not ready.
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).AllowAnonymous();
+app.MapGet("/ready", async (AppDbContext db, CancellationToken cancellationToken) =>
+    await db.Database.CanConnectAsync(cancellationToken)
+        ? Results.Ok(new { status = "ready" })
+        : Results.Json(new { status = "not_ready" }, statusCode: StatusCodes.Status503ServiceUnavailable)).AllowAnonymous();
 
 await DatabaseInitializer.RunAsync(app.Services);
 await app.RunAsync();
